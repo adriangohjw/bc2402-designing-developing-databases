@@ -80,7 +80,6 @@ db.country_vaccinations.aggregate([
             from: "covid19data",
             let: {
                 covid_date: "$date",
-                covid_country: "$couuntry"
             },
             pipeline: [
                 {$match: {location: "Germany"}},
