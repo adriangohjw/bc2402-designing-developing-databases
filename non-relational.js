@@ -46,24 +46,22 @@ db.covid19data.aggregate([
                 covid_date: "$date"
             },
             pipeline: [
+                {$match: {country: "Singapore"}},
+                {$group: {_id:null, min_date: {$min: {$convert: {input:"$date", to: "date"}}}}},
                 {
                     $project: {
-                    country:1, date: {$convert: {input:"$date", to: "date"}}, total_vaccinations:{$convert: {input:"$total_vaccinations", to: "double"}}, daily_vaccinations:{$convert: {input:"$daily_vaccinations", to: "double"}}
+                    country:1, min_date:1
                     }
                 },
                 {
-                        $match:{
-                            $and:[
-                                {$expr: {$eq: ["$country", "$$covid_country"]}},
-                                {$expr: {$eq: ["$date", "$$covid_date"]}}
-                                ]
-                        }
-                }
-            ],
-            as: "vaccine_count"
+                    $match:{
+                        $expr: {$lte: ["$min_date", "$$covid_date"]}}
+                },
+        ],
+        as: "after_vaccination"
         }
     },
-    {$match: {"vaccine_count": {$ne: []}}},
+    {$match: {$expr: {$ne:["$after_vaccination",[]]}}},
     {$group: {_id: '', sum_new_cases: {$sum: "$new_cases"}}},
     {$project: {_id:0, sum_new_cases:1}
 ])
