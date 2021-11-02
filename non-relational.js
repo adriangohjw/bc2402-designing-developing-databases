@@ -216,7 +216,15 @@ db.covid19data.aggregate([
 
 // q13: Generate a list of unique data sources (source_name)
 
-db.getCollectionNames()
+db.country_vaccinations.aggregate([
+    {
+        $group: {
+            _id: {
+                source_name: "$source_name",
+            }
+        }
+    },
+])
 
 
 // q15. When is the first batch of vaccinations recorded in Singapore?
