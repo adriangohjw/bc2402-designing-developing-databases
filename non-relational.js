@@ -278,7 +278,53 @@ db.covid19data.aggregate([
 // in the dataset is Feb-1 2020, the total number of new cases will be the sum of new cases
 // starting from (inclusive) Feb-1 2020 through (inclusive) Dec-31 2020
 
-// waiting for question 15 to be completed
+db.covid19data.aggregate([{
+    $match: {
+        location: "Singapore"
+    }
+}, {
+    $lookup: {
+        from: "country_vaccinations",
+        pipeline: [
+            { $match: { country: "Singapore" } },
+            { $group: { _id: "first_date", first_date: { $min: "$date" } } },
+            { $project: { _id: 0, first_date: 1 } }
+        ],
+        as: "sgFirstVaccineBatch"
+    }
+}, {
+    $unwind: "$sgFirstVaccineBatch"
+}, {
+    $match: {
+        $expr: {
+            $lt: [
+                {
+                    $dateFromString: {
+                        dateString: "$date"
+                    }
+                },
+                {
+                    $convert: {
+                        input: "$sgFirstVaccineBatch.first_date",
+                        to: "date"
+                    }
+                }
+            ]
+        }
+    }
+}, {
+    $group: {
+        _id: "$location",
+        totalNewCases: {
+            $sum: {
+                $convert: {
+                    input: "$new_cases",
+                    to: "double"
+                }
+            }
+        }
+    } 
+}])
 
 
 // q19. Vaccination Drivers. Specific to Germany, based on each daily new case,
