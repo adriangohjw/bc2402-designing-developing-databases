@@ -48,8 +48,17 @@ SELECT
 FROM
     `country_vaccinations`;
 
-
 -----------------
+-- 4) Specific to Singapore, display the daily total_vaccinations starting (inclusive) March-1 2021 through (inclusive) May-31 2021
+-----------------
+
+SELECT 
+	`date`,`total_vaccinations` 
+FROM 
+	(SELECT * FROM country_vaccinations WHERE `country` = "Singapore") AS x 
+WHERE 
+	`date` BETWEEN '3/1/2021' AND '5/31/2021';
+        
 -- 5) When is the first batch of vaccinations recorded in Singapore?
 -----------------
 
@@ -73,7 +82,7 @@ FROM
 WHERE
     location = 'Singapore'
         AND total_vaccinations IS NOT NULL
-        AND total_vaccinations <> ''
+        AND total_vaccinations <> '';
 
 
 -----------------
@@ -111,6 +120,24 @@ WHERE
     `iso_code` = "SGP"
     AND `date`<"2021-01-11";
 
+-----------------
+-- 8) Herd immunity estimation. On a daily basis, specific to Germany, calculate 
+--    the percentage of new cases (i.e., percentage of new cases = new cases / populations)
+--    and total vaccinations on each available vaccine in relation to its population. 
+--    (Total of each type of vaccination as a percentage of the population)
+-----------------
+
+SELECT 
+	`date`, (`new_cases`/`population` * 100) AS `% new cases of population`,
+	`vaccine`,(`total_vaccinations`/`population` * 100) AS `% vaccines`
+FROM
+	(SELECT 
+		`y`.`date`,`y`.`new_cases`,`y`.`population`,`x`.`vaccine`,`x`.`total_vaccinations` 
+	 FROM 
+		(SELECT * FROM covid19data WHERE location = "Germany") y
+	LEFT JOIN  
+		(SELECT * FROM country_vaccinations_by_manufacturer WHERE location = "Germany") x 
+	ON x.`date` = y.`date`) a;
 
 -----------------
 -- 9) Vaccination Drivers. Specific to Germany, based on each daily new case, 
