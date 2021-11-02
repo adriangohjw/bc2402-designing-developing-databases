@@ -286,42 +286,67 @@ db.covid19data.aggregate([
 
 db.covid19data.aggregate([
     { $match: { location: "Germany" } },
-    { $group: { _id: [ { location: "$location" }, { new_cases_date: { $convert: { input: "$date", to: "date"} } }, { new_cases: "$new_cases" } ] } },
-    { $project: { _id: 0, location: { $arrayElemAt: ["$_id.location",0] }, new_cases_date: { $arrayElemAt: ["$_id.new_cases_date",0] }, 
-        new_cases: { $arrayElemAt: ["$_id.new_cases",0] } } },
-    { $lookup: {
-        from: "country_vaccinations_by_manufacturer",
-        let: { new_cases_date: "$new_cases_date" },
-        pipeline: [
-            { $match: { location: "Germany" } },
-            { $group: { _id: { date: { $convert: { input: "$date" , to: "date" } }, vaccine: "$vaccine" }, 
-                total_vaccinations: { $max: { $convert: { input: "$total_vaccinations" to: "int" } } } } },
-            { $project: { date: "$_id.date", vaccine: "$_id.vaccine", total_vaccinations: 1 },
-            { $match: { $expr: { $eq: [ "$date", { $dateAdd: { startDate: "$$new_cases_date", unit: "day", amount: 20 } } ] } } }, 
-            { $project: { _id: 0, date: 1, vaccine: 1, total_vaccinations: 1 } },
-            { $sort: { date: 1 } } ], as: "after_20_days_vaccinations" } },
-    { $lookup: {
-        from: "country_vaccinations_by_manufacturer",
-        let: { new_cases_date: "$new_cases_date" },
-        pipeline: [
-            { $match: { location: "Germany" } },
-            { $group: { _id: { date: { $convert: { input: "$date" , to: "date" } }, vaccine: "$vaccine" }, 
-                total_vaccinations: { $max: { $convert: { input: "$total_vaccinations" to: "int" } } } } },
-            { $project: { date: "$_id.date", vaccine: "$_id.vaccine", total_vaccinations: 1 },
-            { $match: { $expr: { $eq: [ "$date", { $dateAdd: { startDate: "$$new_cases_date", unit: "day", amount: 30 } } ] } } }, 
-            { $project: { _id: 0, date: 1, vaccine: 1, total_vaccinations: 1 } },
-            { $sort: { date: 1 } } ], as: "after_30_days_vaccinations" } },
-    { $lookup: {
-        from: "country_vaccinations_by_manufacturer",
-        let: { new_cases_date: "$new_cases_date" },
-        pipeline: [
-            { $match: { location: "Germany" } },
-            { $group: { _id: { date: { $convert: { input: "$date" , to: "date" } }, vaccine: "$vaccine" }, 
-                total_vaccinations: { $max: { $convert: { input: "$total_vaccinations" to: "int" } } } } },
-            { $project: { date: "$_id.date", vaccine: "$_id.vaccine", total_vaccinations: 1 },
-            { $match: { $expr: { $eq: [ "$date", { $dateAdd: { startDate: "$$new_cases_date", unit: "day", amount: 40 } } ] } } }, 
-            { $project: { _id: 0, date: 1, vaccine: 1, total_vaccinations: 1 } },
-            { $sort: { date: 1 } } ], as: "after_40_days_vaccinations" } },
+    { $group: { _id: [{ location: "$location" }, { new_cases_date: { $convert: { input: "$date", to: "date" } } }, { new_cases: "$new_cases" }] } },
+    {
+        $project: {
+            _id: 0, location: { $arrayElemAt: ["$_id.location", 0] }, new_cases_date: { $arrayElemAt: ["$_id.new_cases_date", 0] },
+            new_cases: { $arrayElemAt: ["$_id.new_cases", 0] }
+        }
+    },
+    {
+        $lookup: {
+            from: "country_vaccinations_by_manufacturer",
+            let: { new_cases_date: "$new_cases_date" },
+            pipeline: [
+                { $match: { location: "Germany" } },
+                {
+                    $group: {
+                        _id: { date: { $convert: { input: "$date", to: "date" } }, vaccine: "$vaccine" },
+                        total_vaccinations: { $max: { $convert: { input: "$total_vaccinations", to: "int" } } }
+                    }
+                },
+                { $project: { date: "$_id.date", vaccine: "$_id.vaccine", total_vaccinations: 1 } },
+                { $match: { $expr: { $eq: ["$date", { $dateAdd: { startDate: "$$new_cases_date", unit: "day", amount: 20 } }] } } },
+                { $project: { _id: 0, date: 1, vaccine: 1, total_vaccinations: 1 } },
+                { $sort: { date: 1 } }], as: "after_20_days_vaccinations"
+        }
+    },
+    {
+        $lookup: {
+            from: "country_vaccinations_by_manufacturer",
+            let: { new_cases_date: "$new_cases_date" },
+            pipeline: [
+                { $match: { location: "Germany" } },
+                {
+                    $group: {
+                        _id: { date: { $convert: { input: "$date", to: "date" } }, vaccine: "$vaccine" },
+                        total_vaccinations: { $max: { $convert: { input: "$total_vaccinations", to: "int" } } }
+                    }
+                },
+                { $project: { date: "$_id.date", vaccine: "$_id.vaccine", total_vaccinations: 1 } },
+                { $match: { $expr: { $eq: ["$date", { $dateAdd: { startDate: "$$new_cases_date", unit: "day", amount: 30 } }] } } },
+                { $project: { _id: 0, date: 1, vaccine: 1, total_vaccinations: 1 } },
+                { $sort: { date: 1 } }], as: "after_30_days_vaccinations"
+        }
+    },
+    {
+        $lookup: {
+            from: "country_vaccinations_by_manufacturer",
+            let: { new_cases_date: "$new_cases_date" },
+            pipeline: [
+                { $match: { location: "Germany" } },
+                {
+                    $group: {
+                        _id: { date: { $convert: { input: "$date", to: "date" } }, vaccine: "$vaccine" },
+                        total_vaccinations: { $max: { $convert: { input: "$total_vaccinations", to: "int" } } }
+                    }
+                },
+                { $project: { date: "$_id.date", vaccine: "$_id.vaccine", total_vaccinations: 1 } },
+                { $match: { $expr: { $eq: ["$date", { $dateAdd: { startDate: "$$new_cases_date", unit: "day", amount: 40 } }] } } },
+                { $project: { _id: 0, date: 1, vaccine: 1, total_vaccinations: 1 } },
+                { $sort: { date: 1 } }], as: "after_40_days_vaccinations"
+        }
+    },
     { $project: { location: 1, new_cases_date: 1, new_cases: 1, after_20_days_vaccinations: 1, after_30_days_vaccinations: 1, after_40_days_vaccinations: 1 } }
 ])
 
