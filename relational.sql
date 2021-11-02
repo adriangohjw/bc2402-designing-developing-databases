@@ -40,6 +40,16 @@ FROM(
 
 
 -----------------
+-- 3) Generate a list of unique data sources (source_name)
+-----------------
+
+SELECT
+    DISTINCT `source_name`
+FROM
+    `country_vaccinations`;
+
+
+-----------------
 -- 5) When is the first batch of vaccinations recorded in Singapore?
 -----------------
 
@@ -84,6 +94,22 @@ WHERE
                     location = 'Singapore'
                     AND total_vaccinations IS NOT NULL
                     AND total_vaccinations <> '');
+
+
+-----------------
+-- 7) Compute the total number of new cases in Singapore before the date identified in (5).
+-- For instance, if the date identified in (5) is Jan-1 2021 and the first date recorded (in Singapore) 
+-- in the dataset is Feb-1 2020, the total number of new cases will be the sum of new cases starting from (inclusive) 
+-- Feb-1 2020 through (inclusive) Dec- 31 2020.
+-----------------
+
+SELECT
+    SUM(`new_cases`) AS `total_cases_before_vaccine`
+FROM
+    `covid19data`
+WHERE 
+    `iso_code` = "SGP"
+    AND `date`<"2021-01-11";
 
 
 -----------------
