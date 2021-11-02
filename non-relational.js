@@ -12,6 +12,23 @@ db.country_vaccinations.aggregate([{
     }
 }])
 
+// q2. Display the sum of daily vaccinations among ASEAN countries.
+// [source table: country_vaccinations]
+db.country_vaccinations.aggregate(
+   [
+        {$match :
+               {
+                   country : {$in : ["Brunei", "Burma", "Cambodia", "Timor-Leste", "Indonesia", "Laos", "Malaysia", "Philippines", "Singapore", "Thailand","Vietnam"]}
+               }
+        },
+        {$group:
+             {
+               _id: { "country" : "$country" },
+               "sum": {$sum: {$convert:{input: "$daily_vaccinations", to: "int"}}}
+             }
+        }
+   ]
+);
 
 // q3. Display the sum of daily vaccinations among ASEAN countries.
 // [source table: country_vaccinations]
@@ -103,6 +120,22 @@ db.country_vaccinations_by_manufacturer.aggregate([{
     }
 }])
 
+// q6. What is the country with the most types of administrated vaccine?
+// [source table: country_vaccinations_by_manufacturer]
+db.country_vaccinations_by_manufacturer.aggregate(
+        [
+            {$group:
+                {
+                _id: {"country":"$location"},
+                "Vaccines": {$addToSet:"$vaccine"},
+                }
+            },
+            {$project:
+                    {"_id":1,"Vaccines":1,count : {$size:"$Vaccines"}}
+            },
+            {$sort:{count:-1}}
+        ]
+    );
 
 // q7. What are the countries that have fully vaccinated more than 60% of its people?
 // For each country, display the vaccines administrated.
@@ -192,6 +225,17 @@ db.country_vaccinations.aggregate([{
     }
 }])
 
+// q10. Compute the global total of vaccinations per vaccine.
+// [source table: country_vaccinations_by_manufacturer]
+db.country_vaccinations_by_manufacturer.aggregate(
+    [
+        {$group:
+        { _id:{"Vaccine":"$vaccine"},
+            count:{$max: {$convert:{input: "$total_vaccinations", to: "double"}}}
+        }
+        }
+        ]
+    )
 
 // q11. What is the total population in Asia?
 
@@ -226,6 +270,18 @@ db.country_vaccinations.aggregate([
     },
 ])
 
+// q14: Specific to Singapore, display the daily total_vaccinations starting (inclusive) March-1 2021 through (inclusive) May-31 2021
+db.country_vaccinations.aggregate(
+    [
+        {$project:{"country":1,"total_vaccinations":1,date:{$convert:{input: "$date",to:"date"}}}},
+        {$match:
+        {$and:[{"country":"Singapore"}, 
+                {"date":{$gte:ISODate("2021-03-01T08:00:00.000+08:00")   }}, 
+                {"date":{$lte:ISODate("2021-05-31T08:00:00.000+08:00")}}]}
+            
+        }
+        ]
+    )
 
 // q15. When is the first batch of vaccinations recorded in Singapore?
 
@@ -326,6 +382,48 @@ db.covid19data.aggregate([{
     } 
 }])
 
+// q18. Herd immunity estimation. On a daily basis, specific to Germany, calculate the percentage of new cases
+//      and total vaccinations on each available vaccine in relation to its population.
+db.covid19data.aggregate( 
+    [
+        {$match:{"location":"Germany"}},
+        {$project:{"location":1,
+                    date:{$convert:{input: "$date",to:"date"}},
+                    "population":{$convert:{input: "$population",to:"double"}},
+                    "new_cases":{$ifNull: [ {$convert:{input: "$new_cases",to:"double"}}, 0 ]}
+        }},
+        {$project:{"location":1,
+                    date:1,
+                    "population":1,
+                    "new_cases":1,
+                    "new_cases_percentage":
+                    {$concat:[{$convert:{input:{$multiply:[{$divide:["$new_cases","$population"]},100]},to:"string"}},"%"]}
+        }},
+        {$lookup:
+            {
+                from:"country_vaccinations_by_manufacturer",
+                let: {date:"$date",population:"$population"},
+                pipeline:[
+                    {$match:{"location":"Germany"}},
+                    {$project:{"location":1,
+                                date:{$convert:{input: "$date",to:"date"}},
+                                "vaccine":1,
+                                "total_vaccinations":{$convert:{input:"$total_vaccinations",to:"double"}},
+                                "percent_of_population":
+                                {$concat:[{$convert:{input:{$multiply:[{$divide:[{$convert:{input:"$total_vaccinations",to:"double"}},"$$population"]},100]},to:"string"}},"%"]}
+                    }},
+                    {$match:
+                        {$expr:
+                            {$eq:["$date","$$date"]}
+                        }
+                    },
+                    {$project:{"vaccine":1,"total_vaccinations":1,"percent_of_population":1}}
+                ],
+                as: "vaccineData"
+            }
+         }
+    ]
+);
 
 // q19. Vaccination Drivers. Specific to Germany, based on each daily new case,
 // display the total vaccinations of each available vaccines after 20 days, 30 days, and 40 days.
