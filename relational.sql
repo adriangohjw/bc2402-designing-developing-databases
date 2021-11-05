@@ -115,9 +115,9 @@ WHERE
 SELECT
     SUM(`new_cases`) AS `total_cases_before_vaccine`
 FROM
-    `covid19data`
+    `covid_cases`
 WHERE 
-    `iso_code` = "SGP"
+    `location` = "Singapore"
     AND `date`<"2021-01-11";
 
 -----------------
