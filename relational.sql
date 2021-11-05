@@ -2,25 +2,7 @@
 -- 1) What is the total population in Asia?
 -----------------
 
-WITH location_latest_date AS (
-    SELECT 
-        location, MAX(date) as max_date
-    FROM
-        covid19data
-    WHERE
-        continent = 'Asia'
-    GROUP BY location
-)
-
-SELECT 
-    *
-FROM
-    covid19data
-        LEFT JOIN
-    location_latest_date ON covid19data.location = location_latest_date.location
-        AND covid19data.date = location_latest_date.max_date
-WHERE
-    location_latest_date.max_date IS NOT NULL;
+Select * from covid19data;
 
 
 -----------------
