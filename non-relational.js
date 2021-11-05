@@ -30,11 +30,13 @@ db.country_vaccinations.aggregate(
    ]
 );
 
-// q3. Display the sum of daily vaccinations among ASEAN countries.
+// q3. Identify the maximum daily vaccinations per million of each country. 
+// Sort the list based on daily vaccinations per million in a descending order.
 // [source table: country_vaccinations]
 
 db.country_vaccinations.aggregate([
-    { $group: { _id: "$country", "max_daily_vaccinations_per_million": { $max: "$daily_vaccinations_per_million" } } }
+    { $group: { _id: "$country", "max_daily_vaccinations_per_million": { $max: { $convert: { input: "$daily_vaccinations_per_million", to: "int" } } } } },
+    { $sort: { max_daily_vaccinations_per_million: -1 } }
 ])
 
 
