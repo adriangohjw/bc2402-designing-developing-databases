@@ -18,7 +18,7 @@ db.country_vaccinations.aggregate(
    [
         {$match :
                {
-                   country : {$in : ["Brunei", "Burma", "Cambodia", "Timor-Leste", "Indonesia", "Laos", "Malaysia", "Philippines", "Singapore", "Thailand","Vietnam"]}
+                   country : {$in : ["Brunei", "Burma", "Cambodia", "Timor", "Indonesia", "Laos", "Malaysia", "Philippines", "Singapore", "Thailand", "Vietnam", "Myanmar"]}
                }
         },
         {$group:
