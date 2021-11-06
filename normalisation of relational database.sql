@@ -23,7 +23,7 @@ AS (SELECT
 		diabetes_prevalence, 
 		female_smokers, 
 		male_smokers, 
-    	handwashing_facilities, 
+		handwashing_facilities, 
 		hospital_beds_per_thousand, 
 		life_expectancy, 
 		human_development_index
