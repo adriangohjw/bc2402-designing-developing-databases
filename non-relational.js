@@ -102,6 +102,7 @@ db.country_vaccinations_by_manufacturer.aggregate([{
 }, {
     $project: {
         vaccine: "$_id.vaccine",
+        first_date: "$first_date",
         days_to_4th_data: {
             $dateDiff: {
                 startDate: {
