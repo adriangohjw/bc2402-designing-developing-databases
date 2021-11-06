@@ -1,4 +1,18 @@
 -----------------
+-- 1) What is the total population in Asia?
+-----------------
+
+SELECT 
+    SUM(population) AS total_population
+FROM
+    location_indicators
+        LEFT JOIN
+    location ON location_indicators.location = location.location
+WHERE
+    location.continent = 'Asia';
+
+
+-----------------
 -- 2) What is the total population among the ten ASEAN countries?
 -----------------
 
@@ -12,6 +26,20 @@ FROM(
     WHERE 
         location IN ('Brunei', 'Myanmar' , 'Cambodia', 'Indonesia', 'Laos', 'Malaysia', 'Philippines', 'Singapore', 'Thailand' , 'Vietnam')
     GROUP BY location) T;
+
+
+-----------------
+-- 5) When is the first batch of vaccinations recorded in Singapore?
+-----------------
+
+SELECT 
+    MIN(date)
+FROM
+    covid_vaccinations
+WHERE
+    location = 'Singapore'
+        AND total_vaccinations <> '';
+
  
 -----------------
 -- 6) Based on the date identified in (5), specific to Singapore, 
@@ -32,7 +60,47 @@ WHERE
                     AND total_vaccinations IS NOT NULL
                     AND total_vaccinations <> '');
                     
-                    
+
+-----------------
+-- 9) Vaccination Drivers. Specific to Germany, based on each daily new case, 
+-- display the total vaccinations of each available vaccines after 20 days, 30 days, and 40 days.
+-----------------
+
+WITH germany_vaccinations_by_manufacturer AS (
+	SELECT 
+		vaccine, date, total_vaccinations
+	FROM
+		country_vaccinations_by_manufacturer
+	WHERE
+		location = 'Germany'
+        AND total_vaccinations <> 0
+), germany_first_vaccine_date_by_manufacturer AS (
+	SELECT 
+		vaccine, MIN(date) AS date
+	FROM
+		germany_vaccinations_by_manufacturer
+	GROUP BY vaccine
+)
+
+SELECT 
+    vaccine_data.vaccine,
+    vaccine_data.date,
+    vaccine_data.total_vaccinations
+FROM
+    germany_vaccinations_by_manufacturer vaccine_data
+        LEFT JOIN
+    germany_first_vaccine_date_by_manufacturer first_vaccine_date ON vaccine_data.vaccine = first_vaccine_date.vaccine
+WHERE
+	vaccine_data.date IN (
+		DATE_ADD(first_vaccine_date.date, INTERVAL 20 DAY),
+    DATE_ADD(first_vaccine_date.date, INTERVAL 30 DAY),
+    DATE_ADD(first_vaccine_date.date, INTERVAL 40 DAY)
+	)
+ORDER BY 
+	vaccine_data.vaccine,
+    vaccine_data.date;
+
+
 -----------------
 -- 10) Vaccination Effects. Specific to Germany, on a daily basis, 
 -- based on the total number of accumulated vaccinations (sum of total_vaccinations of each vaccine in a day), 
