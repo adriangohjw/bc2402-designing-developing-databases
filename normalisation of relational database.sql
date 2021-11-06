@@ -13,6 +13,7 @@ AS (SELECT
 CREATE TABLE location_indicators 
 AS (SELECT 
 		location, 
+		date,
 		population, 
 		population_density, 
 		median_age, aged_65_older, 
@@ -183,12 +184,8 @@ AS (SELECT
 		date);
     
 -- CREATE covid_measures TABLE
-CREATE TABLE covid_measures
-AS (SELECT 
-		location, date, stringency_index
-	FROM 
-		covid19data
-    WHERE 
-		stringency_index <> ''
-    GROUP BY 
-		location, date);
+CREATE TABLE covid_measures AS (SELECT location, date, stringency_index FROM
+    covid19data
+WHERE
+    stringency_index <> ''
+GROUP BY location , date);
