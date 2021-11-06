@@ -6,7 +6,7 @@ AS (SELECT location, iso_code, continent
 
 -- Create TABLE location_indicators
 CREATE TABLE location_indicators 
-AS (SELECT location, population_density, median_age, aged_65_older, aged_70_older, gdp_per_capita, 
+AS (SELECT location, population, population_density, median_age, aged_65_older, aged_70_older, gdp_per_capita, 
 	extreme_poverty, cardiovasc_death_rate, diabetes_prevalence, female_smokers, male_smokers, 
     handwashing_facilities, hospital_beds_per_thousand, life_expectancy, human_development_index
     FROM covid19data
