@@ -50,17 +50,30 @@ AS (SELECT location, date, new_tests, total_tests, total_tests_per_thousand, new
     GROUP BY location, date);
 
 -- CREATE covid_vaccinations TABLE
-CREATE TABLE covid_vaccinations
-AS (SELECT location, date, total_vaccinations, people_vaccinated, people_fully_vaccinated, new_vaccinations, 
-	new_vaccinations_smoothed, total_vaccinations_per_hundred, people_vaccinated_per_hundred, people_fully_vaccinated_per_hundred, 
-	new_vaccinations_smoothed_per_million
-	FROM covid19data
-	WHERE (total_vaccinations, people_vaccinated, people_fully_vaccinated, new_vaccinations, 
-	new_vaccinations_smoothed, total_vaccinations_per_hundred, people_vaccinated_per_hundred, people_fully_vaccinated_per_hundred, 
-	new_vaccinations_smoothed_per_million) <> ('','','','','','','','','')
-	GROUP BY location, date);
+CREATE TABLE covid_vaccinations AS (SELECT location,
+    date,
+    total_vaccinations,
+    people_vaccinated,
+    people_fully_vaccinated,
+    new_vaccinations,
+    new_vaccinations_smoothed,
+    total_vaccinations_per_hundred,
+    people_vaccinated_per_hundred,
+    people_fully_vaccinated_per_hundred,
+    new_vaccinations_smoothed_per_million FROM
+    covid19data
+WHERE
+    (total_vaccinations , people_vaccinated,
+        people_fully_vaccinated,
+        new_vaccinations,
+        new_vaccinations_smoothed,
+        total_vaccinations_per_hundred,
+        people_vaccinated_per_hundred,
+        people_fully_vaccinated_per_hundred,
+        new_vaccinations_smoothed_per_million) <> ('' , '', '', '', '', '', '', '', '')
+GROUP BY location , date);
     
-#-- CREATE covid_measures TABLE
+-- CREATE covid_measures TABLE
 CREATE TABLE covid_measures
 AS (SELECT location, date, stringency_index
 	FROM covid19data
