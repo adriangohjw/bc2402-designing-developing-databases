@@ -59,10 +59,10 @@ FROM
 WHERE 
 	`date` BETWEEN '3/1/2021' AND '5/31/2021';
         
+
+-----------------
 -- 5) When is the first batch of vaccinations recorded in Singapore?
 -----------------
-
--- Solution 1: Using country_vaccinations table
 -- NOTE: Result is in MM/DD/YYYY instead of DD/MM/YYYY
 
 SELECT 
@@ -72,17 +72,6 @@ FROM
 WHERE
     country = 'Singapore'
         AND total_vaccinations <> 0;
-
--- Solution 2: Using covid19data table
-
-SELECT 
-    MIN(date)
-FROM
-    covid19data
-WHERE
-    location = 'Singapore'
-        AND total_vaccinations IS NOT NULL
-        AND total_vaccinations <> '';
 
 
 -----------------
