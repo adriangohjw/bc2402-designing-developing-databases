@@ -9,11 +9,12 @@ WITH location_latest_date AS (
         covid19data
     WHERE
         continent = 'Asia'
+        AND population IS NOT NULL
     GROUP BY location
 )
 
 SELECT 
-    *
+    SUM(population) AS total_population
 FROM
     covid19data
         LEFT JOIN
@@ -21,6 +22,7 @@ FROM
         AND covid19data.date = location_latest_date.max_date
 WHERE
     location_latest_date.max_date IS NOT NULL;
+
 
 
 -----------------
