@@ -503,9 +503,9 @@ db.covid19data.aggregate([
 
 db.country_vaccinations.aggregate([
     {$match: {country: "Germany"}},
-    {$group: {_id:[{country :"$country"},{date: {$convert: {input: "$date", to: "date"}}}] , 
+    {$group: {_id:{country :"$country",date: {$convert: {input: "$date", to: "date"}}}, 
     total_accumulated_vaccinations: {$sum: {$convert:{input: "$total_vaccinations", to: "double"}}}}},
-    {$project: {_id:0,country: {$arrayElemAt: ["$_id.country",0]} , date:{$arrayElemAt: ["$_id.date",0]}, total_accumulated_vaccinations: 1}},
+    {$project: {_id:0,country: "$_id.country" , date:"$_id.date", total_accumulated_vaccinations: 1}},
     {
         $lookup: {
             from: "covid19data",
@@ -532,9 +532,9 @@ db.country_vaccinations.aggregate([
                     $project: {_id:0, new_cases:1}
                 }
             ],
-            as: "new_cases"
+            as: "new_cases_list"
         }
     },
-    {$project: {total_accumulated_vaccinations:1,date:1,cases_after_21_days:{$arrayElemAt:["$new_cases",0]}, cases_after_60_days:{$arrayElemAt:["$new_cases",1]}, cases_after_120_days:{$arrayElemAt:["$new_cases",2]}}},
+    {$project: {total_accumulated_vaccinations:1,date:1,cases_after_21_days:{$arrayElemAt:["$new_cases_list",0]}, cases_after_60_days:{$arrayElemAt:["$new_cases_list",1]}, cases_after_120_days:{$arrayElemAt:["$new_cases_list",2]}}},
     {$sort: {date:1}}
 ])
