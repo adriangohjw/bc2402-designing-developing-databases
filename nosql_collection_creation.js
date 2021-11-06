@@ -17,7 +17,7 @@ db.covid19data.aggregate([
 
 db.sg_data.find({})
 
-//Table for Q18 & Q20 
+//Table for Q18-20
 //From country_vaccinations: date, location, total_vaccinations, vaccine
 //From covid19data: new_cases, population
 db.country_vaccinations_by_manufacturer.aggregate([
