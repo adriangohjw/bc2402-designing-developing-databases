@@ -13,7 +13,6 @@ AS (SELECT
 CREATE TABLE location_indicators 
 AS (SELECT 
 		location, 
-		date,
 		population, 
 		population_density, 
 		median_age, aged_65_older, 
