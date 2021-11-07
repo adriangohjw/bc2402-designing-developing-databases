@@ -16,16 +16,12 @@ WHERE
 -- 2) What is the total population among the ten ASEAN countries?
 -----------------
 
-SELECT 
-    SUM(population) as total_population_among_ASEAN_countries 
-FROM(
-    SELECT 
-        population 
+ SELECT 
+        SUM(population) 
     FROM 
         location_indicators
     WHERE 
-        location IN ('Brunei', 'Myanmar' , 'Cambodia', 'Indonesia', 'Laos', 'Malaysia', 'Philippines', 'Singapore', 'Thailand' , 'Vietnam')
-    GROUP BY location) T;
+        location IN ('Brunei', 'Myanmar' , 'Cambodia', 'Indonesia', 'Laos', 'Malaysia', 'Philippines', 'Singapore', 'Thailand' , 'Vietnam');
 
 
 -----------------
