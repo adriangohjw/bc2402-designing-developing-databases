@@ -136,8 +136,8 @@ SELECT
     T1.date,
 	total_accumulated_vaccinations,
     T2.new_cases AS daily_cases_after_21_days,
-    T3.new_cases AS daily_cases_after_60_day,
-    T4.new_cases AS daily_cases_after_120_day
+    T3.new_cases AS daily_cases_after_60_days,
+    T4.new_cases AS daily_cases_after_120_days
 FROM
     (SELECT 
         location, date,  SUM(total_vaccinations) AS total_accumulated_vaccinations 
