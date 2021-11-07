@@ -73,47 +73,27 @@ db.country_vaccinations_by_manufacturer.aggregate([{
         }
     }
 }, {
-    $project: {
-        vaccine: "$_id.vaccine",
-        first_date: "$first_date"
-    }
-}, {
-    $lookup: {
-       from: "country_vaccinations_by_manufacturer",
-       localField: "vaccine",
-       foreignField: "vaccine",
-       pipeline: [
-            {
-               $match: {
-                    location: "Italy",
-                    total_vaccinations: {
-                        $ne: 0
-                    }
-                }
-            },
-            {
-                $sort: {
-                    date: 1
-                }
-            },
-       ],
-       as: "country_vaccinations_by_manufacturer"
+    $group: {
+        _id: null,
+        min_date: {
+            $min: "$first_date"
+        },
+        max_date: {
+            $max: "$first_date"
+        }
     }
 }, {
     $project: {
-        vaccine: "$_id.vaccine",
-        days_to_4th_data: {
+        daysDifference: {
             $dateDiff: {
                 startDate: {
                     $dateFromString: {
-                        dateString: "$first_date"
+                        dateString: "$min_date"
                     }
                 },
                 endDate: {
                     $dateFromString: {
-                        dateString: {
-                            $arrayElemAt: ["$country_vaccinations_by_manufacturer.date", 4]
-                        }
+                        dateString: "$max_date"
                     }
                 },
                 unit: "day"
@@ -121,6 +101,7 @@ db.country_vaccinations_by_manufacturer.aggregate([{
         }
     }
 }])
+
 
 // q6. What is the country with the most types of administrated vaccine?
 // [source table: country_vaccinations_by_manufacturer]
