@@ -85,6 +85,27 @@ WHERE
                   WHERE `location` = 'Singapore'
 				  AND `total_vaccinations` > 0);
 
+-----------------
+-- 8) Herd immunity estimation. On a daily basis, specific to Germany, calculate 
+--    the percentage of new cases (i.e., percentage of new cases = new cases / populations)
+--    and total vaccinations on each available vaccine in relation to its population. 
+--    (Total of each type of vaccination as a percentage of the population)
+-----------------
+
+SELECT 
+	`date`,`population`,`new_cases`, (`new_cases`/`population` * 100) as `% new cases of population`,`vaccine`,(`total_vaccinations`/`population` * 100) as `% vaccines`
+FROM
+	(SELECT 
+		`y`.`date`,`y`.`new_cases`,`z`.`population`,`x`.`vaccine`,`x`.`total_vaccinations` 
+	FROM 
+		(SELECT * FROM `covid_cases` WHERE `location` = "Germany") y
+	LEFT JOIN  
+		(SELECT * FROM country_vaccinations_by_manufacturer WHERE location = "Germany") x 
+        ON `x`.`date` = `y`.`date`
+	LEFT JOIN
+		(SELECT `location`, `population` FROM `location_indicators` WHERE `location` = "Germany") z
+        ON `y`.`location` = `z`.`location`
+	) a;
 
 -----------------
 -- 9) Vaccination Drivers. Specific to Germany, based on each daily new case, 
