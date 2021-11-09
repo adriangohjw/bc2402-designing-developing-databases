@@ -158,7 +158,7 @@ FROM
     vaccinations_by_manufacturer VBM_40 ON DATE_ADD(daily_new_cases_with_vaccines.date,
         INTERVAL 40 DAY) = VBM_40.date
         AND daily_new_cases_with_vaccines.vaccine = VBM_40.vaccine
-ORDER BY daily_new_cases_with_vaccines.date ASC , daily_new_cases_with_vaccines.vaccine ASC
+ORDER BY daily_new_cases_with_vaccines.date ASC , daily_new_cases_with_vaccines.vaccine ASC;
 
 
 -----------------
