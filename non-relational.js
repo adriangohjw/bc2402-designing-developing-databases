@@ -501,9 +501,9 @@ db.covid19data.aggregate([
 // accumulated vaccinations (sum of total_vaccinations of each vaccine in a day), generate 
 // the daily new cases after 21 days, 60 days, and 120 days
 
-db.country_vaccinations.aggregate([
-    {$match: {country: "Germany"}},
-    {$group: {_id:{country :"$country",date: {$convert: {input: "$date", to: "date"}}}, 
+db.country_vaccinations_by_manufacturer.aggregate([
+    {$match: {location: "Germany"}},
+    {$group: {_id:{date: {$convert: {input: "$date", to: "date"}}}, 
     total_accumulated_vaccinations: {$sum: {$convert:{input: "$total_vaccinations", to: "double"}}}}},
     {$project: {_id:0,country: "$_id.country" , date:"$_id.date", total_accumulated_vaccinations: 1}},
     {
