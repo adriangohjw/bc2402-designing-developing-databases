@@ -188,13 +188,13 @@ JOIN
     WHERE 
         location = 'Germany') T2
 ON T2.date = date_add(T1.date, interval 21 day)
-JOIN
+LEFT JOIN
     (SELECT 
         date, new_cases FROM covid_cases
     WHERE 
         location = 'Germany') T3
 ON T3.date = date_add(T1.date, interval 60 day)
-JOIN
+LEFT JOIN
     (SELECT 
         date, new_cases FROM covid_cases
     WHERE 
