@@ -112,39 +112,53 @@ FROM
 -- display the total vaccinations of each available vaccines after 20 days, 30 days, and 40 days.
 -----------------
 
-WITH germany_vaccinations_by_manufacturer AS (
+WITH daily_new_cases AS (
 	SELECT 
-		vaccine, date, total_vaccinations
+		location, date, new_cases
+	FROM
+		covid_cases
+	WHERE
+		location = 'Germany'
+), vaccinations_by_manufacturer AS (
+	SELECT 
+		date, vaccine, total_vaccinations
 	FROM
 		country_vaccinations_by_manufacturer
 	WHERE
 		location = 'Germany'
-        AND total_vaccinations <> 0
-), germany_first_vaccine_date_by_manufacturer AS (
-	SELECT 
-		vaccine, MIN(date) AS date
+), distinct_vaccines AS (
+	SELECT DISTINCT
+		vaccine
 	FROM
-		germany_vaccinations_by_manufacturer
-	GROUP BY vaccine
+		vaccinations_by_manufacturer
 )
 
 SELECT 
-    vaccine_data.vaccine,
-    vaccine_data.date,
-    vaccine_data.total_vaccinations
+    daily_new_cases_with_vaccines.*,
+    VBM_20.date,
+    VBM_20.total_vaccinations,
+    VBM_30.date,
+    VBM_30.total_vaccinations,
+    VBM_40.date,
+    VBM_40.total_vaccinations
 FROM
-    germany_vaccinations_by_manufacturer vaccine_data
+    (SELECT 
+        *
+    FROM
+        daily_new_cases, distinct_vaccines) daily_new_cases_with_vaccines
         LEFT JOIN
-    germany_first_vaccine_date_by_manufacturer first_vaccine_date ON vaccine_data.vaccine = first_vaccine_date.vaccine
-WHERE
-	vaccine_data.date IN (
-		DATE_ADD(first_vaccine_date.date, INTERVAL 20 DAY),
-    DATE_ADD(first_vaccine_date.date, INTERVAL 30 DAY),
-    DATE_ADD(first_vaccine_date.date, INTERVAL 40 DAY)
-	)
-ORDER BY 
-	vaccine_data.vaccine,
-    vaccine_data.date;
+    vaccinations_by_manufacturer VBM_20 ON DATE_ADD(daily_new_cases_with_vaccines.date,
+        INTERVAL 20 DAY) = VBM_20.date
+        AND daily_new_cases_with_vaccines.vaccine = VBM_20.vaccine
+        LEFT JOIN
+    vaccinations_by_manufacturer VBM_30 ON DATE_ADD(daily_new_cases_with_vaccines.date,
+        INTERVAL 30 DAY) = VBM_30.date
+        AND daily_new_cases_with_vaccines.vaccine = VBM_30.vaccine
+        LEFT JOIN
+    vaccinations_by_manufacturer VBM_40 ON DATE_ADD(daily_new_cases_with_vaccines.date,
+        INTERVAL 40 DAY) = VBM_40.date
+        AND daily_new_cases_with_vaccines.vaccine = VBM_40.vaccine
+ORDER BY daily_new_cases_with_vaccines.date ASC , daily_new_cases_with_vaccines.vaccine ASC
 
 
 -----------------
