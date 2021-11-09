@@ -56,6 +56,26 @@ db.country_vaccinations_by_manufacturer.aggregate([
 // then compute the difference in days between the earliest date and the 4th date.
 // [source table: country_vaccinations_by_manufacturer]
 
+// Identify the first dates of each vaccine being administrated
+db.country_vaccinations_by_manufacturer.aggregate([{
+    $match: {
+        location: "Italy",
+        total_vaccinations: {
+            $ne: 0
+        }
+    }
+}, {
+    $group: {
+        _id: {
+            vaccine: "$vaccine"
+        },
+        first_date: {
+            $min: "$date"
+        }
+    }
+}])
+
+// compute the difference in days between the earliest date and the 4th date.
 db.country_vaccinations_by_manufacturer.aggregate([{
     $match: {
         location: "Italy",
