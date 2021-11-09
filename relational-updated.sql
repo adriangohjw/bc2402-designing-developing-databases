@@ -182,7 +182,7 @@ FROM
         location = 'Germany'
     GROUP BY 
         location, date) T1
-JOIN 
+INNER JOIN 
     (SELECT 
         date, new_cases FROM covid_cases
     WHERE 
