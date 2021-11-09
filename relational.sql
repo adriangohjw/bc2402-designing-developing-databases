@@ -135,6 +135,8 @@ FROM
 -- display the total vaccinations of each available vaccines after 20 days, 30 days, and 40 days.
 -----------------
 
+-- DEPRECATED: Refer to updated script in relational-updated.sql
+
 WITH germany_vaccinations_by_manufacturer AS (
 	SELECT 
 		vaccine, date, total_vaccinations
