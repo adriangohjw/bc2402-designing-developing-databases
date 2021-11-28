@@ -1,0 +1,3 @@
+Instructions for deployment and implementation for both databases can be found in the report.
+
+Data files to be used are those found on NTULearn.
